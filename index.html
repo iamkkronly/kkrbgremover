@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Background Remover</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #preview, #result {
+            max-width: 100%;
+            margin-top: 20px;
+            display: none;
+        }
+        #loading {
+            font-size: 18px;
+            font-weight: bold;
+            color: red;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Image Background Remover</h2>
+    <input type="file" id="upload" accept="image/*">
+    <br>
+    <img id="preview" src="">
+    <br>
+    <button onclick="removeBackground()">Remove Background</button>
+    <br>
+    <div id="loading">Processing... Please wait</div>
+    <br>
+    <img id="result" src="">
+    
+    <script>
+        document.getElementById('upload').addEventListener('change', function(event) {
+            let reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('preview').src = reader.result;
+                document.getElementById('preview').style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        });
+
+        function removeBackground() {
+            let file = document.getElementById('upload').files[0];
+            if (!file) {
+                alert("Please upload an image first.");
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block'; // Show loading message
+            document.getElementById('result').style.display = 'none';  // Hide result while loading
+
+            let formData = new FormData();
+            formData.append("image_file", file);
+            formData.append("size", "auto");
+
+            fetch("https://api.remove.bg/v1.0/removebg", {
+                method: "POST",
+                headers: {
+                    "X-Api-Key": "PhLUDFd4PgkwX5z5qtzyXMNi"
+                },
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                let url = URL.createObjectURL(blob);
+                document.getElementById('result').src = url;
+                document.getElementById('loading').style.display = 'none'; // Hide loading message
+                document.getElementById('result').style.display = 'block'; // Show result image
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById('loading').textContent = "Error processing image.";
+            });
+        }
+    </script>
+
+</body>
+</html>
