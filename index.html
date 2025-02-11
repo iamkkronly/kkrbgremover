@@ -1,39 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Background Remover</title>
     <style>
         body {
+            background: linear-gradient(to right, #667eea, #764ba2);
             text-align: center;
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            margin: 0;
+            padding: 20px;
         }
-        #preview, #result {
-            max-width: 100%;
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            border: 2px dashed #fff;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #ff4757;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: space-around;
             margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .image-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            width: 250px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-box img {
+            max-width: 100%;
+            border-radius: 5px;
             display: none;
         }
+
+        .image-box p {
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+        }
+
         #loading {
             font-size: 18px;
             font-weight: bold;
-            color: red;
-            margin-top: 20px;
+            color: #ffcc00;
+            margin-top: 10px;
             display: none;
+        }
+
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
     <h2>Image Background Remover</h2>
-    <input type="file" id="upload" accept="image/*">
-    <br>
-    <img id="preview" src="">
-    <br>
-    <button onclick="removeBackground()">Remove Background</button>
-    <br>
-    <div id="loading">Processing... Please wait</div>
-    <br>
-    <img id="result" src="">
-    
+    <div class="container">
+        <input type="file" id="upload" accept="image/*">
+        <br>
+        <button class="btn" onclick="removeBackground()">Remove Background</button>
+
+        <div class="image-container">
+            <div class="image-box">
+                <p>Original Image</p>
+                <img id="preview" src="">
+            </div>
+            <div class="image-box">
+                <p>Background Removed</p>
+                <div id="loading">Processing... Please wait</div>
+                <div class="loader" id="loader"></div>
+                <img id="result" src="">
+            </div>
+        </div>
+    </div>
+
     <script>
         document.getElementById('upload').addEventListener('change', function(event) {
             let reader = new FileReader();
@@ -51,8 +150,9 @@
                 return;
             }
 
-            document.getElementById('loading').style.display = 'block'; // Show loading message
-            document.getElementById('result').style.display = 'none';  // Hide result while loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
 
             let formData = new FormData();
             formData.append("image_file", file);
@@ -69,12 +169,14 @@
             .then(blob => {
                 let url = URL.createObjectURL(blob);
                 document.getElementById('result').src = url;
-                document.getElementById('loading').style.display = 'none'; // Hide loading message
-                document.getElementById('result').style.display = 'block'; // Show result image
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('loader').style.display = 'none';
             })
             .catch(error => {
                 console.error("Error:", error);
                 document.getElementById('loading').textContent = "Error processing image.";
+                document.getElementById('loader').style.display = 'none';
             });
         }
     </script>
